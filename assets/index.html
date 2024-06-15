@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="/css/main.css">
+  </head>
+
+  <body>
+    <h1>Welcome!</h1>
+		<div>
+			<p>API call result: <span id="apiresult"></span></p>
+		</div>
+		<div>
+			<p>WebSocket results: <ul id="wsresult"></ul></p>
+		</div>
+	</body>
+
+  <script>
+		function formatResult(data) {
+			return data.i + "," + data.s
+		}
+
+		// API call
+		async function getApiData() {
+			const apiresponse = await fetch("http://localhost:8080/api/json/")
+			const apidata = await apiresponse.json();
+			document.getElementById("apiresult").innerHTML = formatResult(apidata)
+		}
+		getApiData()
+
+		// websocket data
+		webSocket = new WebSocket("http://localhost:8080/api/ws/")
+	
+		// uncomment if you want to send a message
+		/*
+		webSocket.onopen = (event) => {
+		  webSocket.send("Message from the browser to the server");
+		}
+    */
+
+		webSocket.onmessage = (event) => {
+		  handleWebsocketRead(event.data);
+    };
+
+		function handleWebsocketRead(data) {
+			elem = document.getElementById("wsresult")
+			elem.innerHTML += "<li>"+formatResult(JSON.parse(data))+"</li>"
+		}
+	</script>
+</html>
